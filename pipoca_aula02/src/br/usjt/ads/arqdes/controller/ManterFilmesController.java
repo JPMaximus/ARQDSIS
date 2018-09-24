@@ -37,6 +37,7 @@ public class ManterFilmesController extends HttpServlet {
 		HttpSession session;
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		ArrayList<Genero> generos;
+		ArrayList<Filme> lista;
 
 		// Pega os atributos do filme utilizado na ação
 		String titulo = request.getParameter("titulo");
@@ -111,7 +112,7 @@ public class ManterFilmesController extends HttpServlet {
 		case "listar":
 			session = request.getSession();
 			fService = new FilmeService();
-			ArrayList<Filme> lista;
+			
 			if (chave != null && chave.length() > 0) {
 				lista = fService.listarFilmes(chave);
 			} else {
@@ -119,6 +120,25 @@ public class ManterFilmesController extends HttpServlet {
 			}
 			session.setAttribute("lista", lista);
 			dispatcher = request.getRequestDispatcher("ListarFilmes.jsp");
+			dispatcher.forward(request, response);
+			break;
+			
+		case "listarfilmesgenero":
+			session = request.getSession();
+			fService = new FilmeService();
+		
+			if (chave != null && chave.length() > 0) {
+				lista = fService.listarFilmes(chave);
+			} else {
+				lista = fService.listarFilmes();
+			}
+			session.setAttribute("lista", lista);
+			
+			gService = new GeneroService();
+			generos = gService.listarGeneros();
+			session.setAttribute("generos", generos);
+			
+			dispatcher = request.getRequestDispatcher("ListarFilmesGenero.jsp");
 			dispatcher.forward(request, response);
 			break;
 
@@ -188,7 +208,16 @@ public class ManterFilmesController extends HttpServlet {
 			fService = new FilmeService();
 			fService.excluirFilme(Integer.parseInt(request.getParameter("id")));
 			
-			//Manda para tela de Listar Filmes (Nescessário realizar nova busca para ver resultado)
+			//Atualiza lista
+			session = request.getSession();
+			if (chave != null && chave.length() > 0) {
+				lista = fService.listarFilmes(chave);
+			} else {
+				lista = fService.listarFilmes();
+			}
+			session.setAttribute("lista", lista);
+			
+			//Manda para tela ListarFilmes
 			dispatcher = request.getRequestDispatcher("ListarFilmes.jsp");
 			dispatcher.forward(request, response);
 			break;
