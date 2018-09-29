@@ -17,9 +17,9 @@
                     <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Catálogo</a>
                     		<ul class="dropdown-menu">
-  						  <li><a class="dropdown-item" href="manterfilmes.do?acao=listarfilmesgenero">por Gênero</a></li>
-  						   <li><a class="dropdown-item" href="#">por Popularidade</a></li>
-  						   <li><a class="dropdown-item" href="#">Lançamentos</a></li>
+  						  <li><a class="dropdown-item" href="manterfilmes.do?acao=listarfilmesgenero">Gêneros</a></li>
+  						   <li><a class="dropdown-item" href="manterfilmes.do?acao=listarfilmespopularidade">Popularidade</a></li>
+  						   <li><a class="dropdown-item" href="manterfilmes.do?acao=listarfilmesdata">Lançamentos</a></li>
 						</ul>
                     </li>
                 </ul>

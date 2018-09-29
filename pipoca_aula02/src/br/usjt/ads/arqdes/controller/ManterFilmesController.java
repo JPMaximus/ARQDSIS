@@ -38,7 +38,8 @@ public class ManterFilmesController extends HttpServlet {
 		DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		ArrayList<Genero> generos;
 		ArrayList<Filme> lista;
-
+		ArrayList<ArrayList<Filme>> listas;
+		
 		// Pega os atributos do filme utilizado na ação
 		String titulo = request.getParameter("titulo");
 		String descricao = request.getParameter("descricao");
@@ -53,19 +54,19 @@ public class ManterFilmesController extends HttpServlet {
 
 		switch (acao) {
 		case "novo":
-			//Cria Sessão para setar o comboBox Genero
+			// Cria Sessão para setar o comboBox Genero
 			gService = new GeneroService();
 			generos = gService.listarGeneros();
 			session = request.getSession();
 			session.setAttribute("generos", generos);
-			
-			//Manda para tela criar Filmes
+
+			// Manda para tela criar Filmes
 			dispatcher = request.getRequestDispatcher("CriarFilme.jsp");
 			dispatcher.forward(request, response);
 			break;
 
 		case "criar":
-			//Seta atributos do filme
+			// Seta atributos do filme
 			fService = new FilmeService();
 			filme = new Filme();
 			filme.setTitulo(titulo);
@@ -83,28 +84,37 @@ public class ManterFilmesController extends HttpServlet {
 			filme.setPopularidade(Double.parseDouble(popularidade));
 			filme.setPosterPath(posterPath);
 
-			//Seta atributos do genero
+			// Seta atributos do genero
 			gService = new GeneroService();
 			Genero genero = new Genero();
 			genero.setId(Integer.parseInt(idGenero));
 			genero.setNome(gService.buscarGenero(genero.getId()).getNome());
 			filme.setGenero(genero);
-			
-			//Insere o Filme
+
+			// Insere o Filme
 			filme = fService.inserirFilme(filme);
 			request.setAttribute("filme", filme);
 
-			//Manda para tela VisualizarFilme
+			// Atualiza lista
+			session = request.getSession();
+			if (chave != null && chave.length() > 0) {
+				lista = fService.listarFilmes(chave);
+			} else {
+				lista = fService.listarFilmes();
+			}
+			session.setAttribute("lista", lista);
+
+			// Manda para tela VisualizarFilme
 			dispatcher = request.getRequestDispatcher("VisualizarFilme.jsp");
 			dispatcher.forward(request, response);
 			break;
-			
+
 		case "reiniciar":
-			//Apaga a lista da Sessão
+			// Apaga a lista da Sessão
 			session = request.getSession();
 			session.setAttribute("lista", null);
-			
-			//Manda para tela ListarFilmes
+
+			// Manda para tela ListarFilmes
 			dispatcher = request.getRequestDispatcher("ListarFilmes.jsp");
 			dispatcher.forward(request, response);
 			break;
@@ -112,38 +122,69 @@ public class ManterFilmesController extends HttpServlet {
 		case "listar":
 			session = request.getSession();
 			fService = new FilmeService();
-			
+
 			if (chave != null && chave.length() > 0) {
 				lista = fService.listarFilmes(chave);
 			} else {
 				lista = fService.listarFilmes();
 			}
 			session.setAttribute("lista", lista);
+			
 			dispatcher = request.getRequestDispatcher("ListarFilmes.jsp");
 			dispatcher.forward(request, response);
 			break;
-			
+
 		case "listarfilmesgenero":
 			session = request.getSession();
 			fService = new FilmeService();
-		
+
 			if (chave != null && chave.length() > 0) {
 				lista = fService.listarFilmes(chave);
 			} else {
 				lista = fService.listarFilmes();
 			}
 			session.setAttribute("lista", lista);
-			
+
 			gService = new GeneroService();
 			generos = gService.listarGeneros();
 			session.setAttribute("generos", generos);
-			
+
 			dispatcher = request.getRequestDispatcher("ListarFilmesGenero.jsp");
 			dispatcher.forward(request, response);
 			break;
 
+		case "listarfilmespopularidade":
+			session = request.getSession();
+			fService = new FilmeService();
+			
+			listas =	fService.listarFilmesPop();
+						
+			session.setAttribute("listapop1", listas.get(0));
+			session.setAttribute("listapop2", listas.get(1));
+			session.setAttribute("listapop3", listas.get(2));
+			session.setAttribute("listapop4", listas.get(3));
+			
+			dispatcher = request.getRequestDispatcher("ListarFilmesPopularidade.jsp");
+			dispatcher.forward(request, response);
+			break;
+
+		case "listarfilmesdata":
+			session = request.getSession();
+			fService = new FilmeService();
+			
+			listas = fService.listarFilmesData();
+			
+			session.setAttribute("listaperiodo1", listas.get(0));
+			session.setAttribute("listaperiodo2", listas.get(1));
+			session.setAttribute("listaperiodo3", listas.get(2));
+			session.setAttribute("listaperiodo4", listas.get(3));
+			
+			dispatcher = request.getRequestDispatcher("ListarFilmesData.jsp");
+			dispatcher.forward(request, response);
+			break;
+			
 		case "editar":
-			//Busca o filme e popula o genero
+			// Busca o filme e popula o genero
 			fService = new FilmeService();
 			gService = new GeneroService();
 			filme = fService.buscarFilme(Integer.parseInt(request.getParameter("id")));
@@ -152,7 +193,7 @@ public class ManterFilmesController extends HttpServlet {
 			session.setAttribute("generos", generos);
 			request.setAttribute("filme", filme);
 
-			//Manda para tela de EditarFilmes
+			// Manda para tela de EditarFilmes
 			dispatcher = request.getRequestDispatcher("EditarFilme.jsp");
 			dispatcher.forward(request, response);
 			break;
@@ -183,32 +224,11 @@ public class ManterFilmesController extends HttpServlet {
 			genero.setNome(gService.buscarGenero(genero.getId()).getNome());
 			filme.setGenero(genero);
 
-			//Edita o Filme
+			// Edita o Filme
 			fService.editarFilme(filme);
 			request.setAttribute("filme", filme);
-			
-			//Manda pra Visualizar
-			dispatcher = request.getRequestDispatcher("VisualizarFilme.jsp");
-			dispatcher.forward(request, response);
-			break;
 
-		case "visualizar":
-			//Busca o filme
-			fService = new FilmeService();
-			filme = fService.buscarFilme(Integer.parseInt(request.getParameter("id")));
-			request.setAttribute("filme", filme);
-
-			//Manda pra Visualizar
-			dispatcher = request.getRequestDispatcher("VisualizarFilme.jsp");
-			dispatcher.forward(request, response);
-			break;
-
-		case "excluir":
-			//Excluí o filme
-			fService = new FilmeService();
-			fService.excluirFilme(Integer.parseInt(request.getParameter("id")));
-			
-			//Atualiza lista
+			// Atualiza lista
 			session = request.getSession();
 			if (chave != null && chave.length() > 0) {
 				lista = fService.listarFilmes(chave);
@@ -216,8 +236,38 @@ public class ManterFilmesController extends HttpServlet {
 				lista = fService.listarFilmes();
 			}
 			session.setAttribute("lista", lista);
-			
-			//Manda para tela ListarFilmes
+
+			// Manda pra Visualizar
+			dispatcher = request.getRequestDispatcher("VisualizarFilme.jsp");
+			dispatcher.forward(request, response);
+			break;
+
+		case "visualizar":
+			// Busca o filme
+			fService = new FilmeService();
+			filme = fService.buscarFilme(Integer.parseInt(request.getParameter("id")));
+			request.setAttribute("filme", filme);
+
+			// Manda pra Visualizar
+			dispatcher = request.getRequestDispatcher("VisualizarFilme.jsp");
+			dispatcher.forward(request, response);
+			break;
+
+		case "excluir":
+			// Excluí o filme
+			fService = new FilmeService();
+			fService.excluirFilme(Integer.parseInt(request.getParameter("id")));
+
+			// Atualiza lista
+			session = request.getSession();
+			if (chave != null && chave.length() > 0) {
+				lista = fService.listarFilmes(chave);
+			} else {
+				lista = fService.listarFilmes();
+			}
+			session.setAttribute("lista", lista);
+
+			// Manda para tela ListarFilmes
 			dispatcher = request.getRequestDispatcher("ListarFilmes.jsp");
 			dispatcher.forward(request, response);
 			break;

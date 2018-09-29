@@ -31,6 +31,14 @@ public class FilmeService {
 		return dao.listarFilmes();
 	}
 	
+	public ArrayList<ArrayList<Filme>> listarFilmesPop() throws IOException{
+		return dao.listarFilmesPop();
+	}
+	
+	public ArrayList<ArrayList<Filme>> listarFilmesData() throws IOException{
+		return dao.listarFilmesData();
+	}
+
 	public Filme editarFilme(Filme filme) throws IOException{
 		int id = dao.editarFilme(filme);
 		filme.setId(id);

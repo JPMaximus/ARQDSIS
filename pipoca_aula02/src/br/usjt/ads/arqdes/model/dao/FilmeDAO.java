@@ -6,7 +6,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-
 import br.usjt.ads.arqdes.model.entity.Filme;
 import br.usjt.ads.arqdes.model.entity.Genero;
 
@@ -53,11 +52,11 @@ public class FilmeDAO {
 				+ "where f.id_genero = g.id AND f.id = " + id;
 		Filme filme = new Filme();
 		Genero genero = new Genero();
-		
+
 		try (Connection conn = ConnectionFactory.getConnection();
 				PreparedStatement pst = conn.prepareStatement(sql);
 				ResultSet rs = pst.executeQuery();) {
-		
+
 			while (rs.next()) {
 				filme.setId(rs.getInt("f.id"));
 				filme.setTitulo(rs.getString("f.titulo"));
@@ -147,12 +146,306 @@ public class FilmeDAO {
 		return lista;
 	}
 
+	public ArrayList<ArrayList<Filme>> listarFilmesPop() throws IOException {
+		ArrayList<ArrayList<Filme>> listas = new ArrayList<>();
+		String sql1 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where popularidade >= 0 && popularidade <= 25";
+		String sql2 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where popularidade >= 26 && popularidade <= 50";
+		String sql3 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where popularidade >= 51 && popularidade <= 75";
+		String sql4 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where popularidade >= 76 && popularidade <= 100";
+		
+		//Cria o array de lista de filmes recursivamente
+		for(int i = 1; i <= 4; i++) {
+            ArrayList<Filme> listaPop = new ArrayList<>();
+            String sql = (i == 1 ? sql1 : (i == 2 ? sql2 : (i == 3 ? sql3 : sql4))); //Professor, você chegou uma vez a comentar sobre este if.
+
+            try (Connection conn = ConnectionFactory.getConnection();
+                    PreparedStatement pst = conn.prepareStatement(sql);
+                    ResultSet rs = pst.executeQuery();) {
+
+                Filme filme;
+                while (rs.next()) {
+                    filme = new Filme();
+                    filme.setId(rs.getInt("id"));
+                    filme.setTitulo(rs.getString("titulo"));
+                    filme.setDescricao(rs.getString("descricao"));
+                    filme.setDiretor(rs.getString("diretor"));
+                    filme.setPosterPath(rs.getString("posterpath"));
+                    filme.setDataLancamento(rs.getDate("data_lancamento"));
+                    listaPop.add(filme);
+                }
+
+                listas.add(listaPop);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new IOException(e);
+            }
+        }
+		
+		/* Primeira Tentativa Gigantesca	 estava criando um arraylist pra cada lista ao invés de usar recursividade
+		ArrayList<Filme> listaPop1 = new ArrayList<>();
+		ArrayList<Filme> listaPop2 = new ArrayList<>();
+		ArrayList<Filme> listaPop3 = new ArrayList<>();
+		ArrayList<Filme> listaPop4 = new ArrayList<>();
+		
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql1);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPop1.add(filme);
+			}
+
+			listas.add(listaPop1);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql2);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPop2.add(filme);
+			}
+
+			listas.add(listaPop2);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql3);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPop3.add(filme);
+			}
+
+			listas.add(listaPop3);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql4);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPop4.add(filme);
+			}
+
+			listas.add(listaPop4);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}*/
+
+		return listas;
+	}
+
+	public ArrayList<ArrayList<Filme>> listarFilmesData() throws IOException {
+		ArrayList<ArrayList<Filme>> listas = new ArrayList<>();
+		
+		String sql1 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento BETWEEN DATE_ADD(NOW(), INTERVAL -1 MONTH) AND "
+				+ "NOW()";
+		String sql2 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento BETWEEN  DATE_ADD(NOW(), INTERVAL -1 YEAR) AND "
+				+ "DATE_ADD(NOW(), INTERVAL -1 MONTH)";
+		String sql3 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento BETWEEN DATE_ADD(NOW(), INTERVAL -10 YEAR) AND "
+				+ "DATE_ADD(NOW(), INTERVAL -1 YEAR)";
+		String sql4 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento < DATE_ADD(NOW(), INTERVAL -10 YEAR)";
+		
+		for(int i = 1; i <= 4; i++) {
+			ArrayList<Filme> listaPeriodo = new ArrayList<>();
+			String sql = (i == 1 ? sql1 : (i == 2 ? sql2 : (i == 3 ? sql3 : sql4)));
+
+            try (Connection conn = ConnectionFactory.getConnection();
+                    PreparedStatement pst = conn.prepareStatement(sql);
+                    ResultSet rs = pst.executeQuery();) {
+
+                Filme filme;
+                while (rs.next()) {
+                    filme = new Filme();
+                    filme.setId(rs.getInt("id"));
+                    filme.setTitulo(rs.getString("titulo"));
+                    filme.setDescricao(rs.getString("descricao"));
+                    filme.setDiretor(rs.getString("diretor"));
+                    filme.setPosterPath(rs.getString("posterpath"));
+                    filme.setDataLancamento(rs.getDate("data_lancamento"));
+                    listaPeriodo.add(filme);
+                }
+
+                listas.add(listaPeriodo);
+
+            } catch (SQLException e) {
+                e.printStackTrace();
+                throw new IOException(e);
+            }
+        }
+		
+		/*ArrayList<Filme> listaPeriodo1 = new ArrayList<>();
+		ArrayList<Filme> listaPeriodo2 = new ArrayList<>();
+		ArrayList<Filme> listaPeriodo3 = new ArrayList<>();
+		ArrayList<Filme> listaPeriodo4 = new ArrayList<>();
+
+		String sql1 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento BETWEEN CURRENT_TIMESTAMP() AND "
+				+ "DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 MONTH)";
+		String sql2 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento BETWEEN DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 MONTH) AND "
+				+ "DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 YEAR)";
+		String sql3 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento BETWEENDATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 1 YEAR) AND "
+				+ "DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 10 YEAR)";
+		String sql4 = "select id, titulo, descricao, diretor, posterpath, popularidade, data_lancamento, id_genero from filme "
+				+ "where data_Lancamento > DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 10 YEAR)";
+
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql1);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPeriodo1.add(filme);
+			}
+
+			listas.add(listaPeriodo1);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+		
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql2);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPeriodo2.add(filme);
+			}
+
+			listas.add(listaPeriodo2);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql3);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPeriodo3.add(filme);
+			}
+
+			listas.add(listaPeriodo3);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}
+		
+		try (Connection conn = ConnectionFactory.getConnection();
+				PreparedStatement pst = conn.prepareStatement(sql4);
+				ResultSet rs = pst.executeQuery();) {
+
+			Filme filme;
+			while (rs.next()) {
+				filme = new Filme();
+				filme.setId(rs.getInt("id"));
+				filme.setTitulo(rs.getString("titulo"));
+				filme.setDescricao(rs.getString("descricao"));
+				filme.setDiretor(rs.getString("diretor"));
+				filme.setPosterPath(rs.getString("posterpath"));
+				filme.setDataLancamento(rs.getDate("data_lancamento"));
+				listaPeriodo4.add(filme);
+			}
+
+			listas.add(listaPeriodo4);
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IOException(e);
+		}*/
+		return listas;
+	}
+
 	public int editarFilme(Filme filme) throws IOException {
 		String sql = "UPDATE filme set titulo=?, descricao=?, diretor=?, posterPath=?, popularidade=?, data_Lancamento=?, id_genero=? "
 				+ "where id = ?";
 
-		try (Connection conn = ConnectionFactory.getConnection();
-				PreparedStatement pst = conn.prepareStatement(sql);) {
+		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement pst = conn.prepareStatement(sql);) {
 
 			pst.setString(1, filme.getTitulo());
 			pst.setString(2, filme.getDescricao());
@@ -174,16 +467,15 @@ public class FilmeDAO {
 		}
 		return filme.getId();
 	}
-	
-	public boolean excluirFilme(int id) throws  IOException {
+
+	public boolean excluirFilme(int id) throws IOException {
 		String sql = "DELETE FROM filme WHERE id = ?";
-		
-		try (Connection conn = ConnectionFactory.getConnection();
-				PreparedStatement pst = conn.prepareStatement(sql);){
+
+		try (Connection conn = ConnectionFactory.getConnection(); PreparedStatement pst = conn.prepareStatement(sql);) {
 			pst.setInt(1, id);
 			pst.execute();
 			return true;
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

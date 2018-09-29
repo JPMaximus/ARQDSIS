@@ -73,13 +73,13 @@
 										<c:choose>
 											<c:when test="${contador == 0}">
 												<div class="item active">
-													<img src="${filme.posterPath}" alt="?" width="300" height="345">
+													<img src="${filme.posterPath}" alt="?" width="250" height="100">
 													<c:set var="contador" value="1" />
 												</div>
 											</c:when>
 											<c:otherwise>
 												<div class="item">
-													<img src="${filme.posterPath}" alt="?" width="300"	height="345">
+													<img src="${filme.posterPath}" alt="?" width="250"	height="100">
 												</div>
 											</c:otherwise>
 										</c:choose>
